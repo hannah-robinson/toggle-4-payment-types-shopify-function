@@ -8,6 +8,7 @@
 /**
  * @type {FunctionResult}
  */
+
 const NO_CHANGES = {
   operations: [],
 }
@@ -43,32 +44,28 @@ export default /**
     klarna = false
   }
 
-  if (cartTotal < 100) {
-    // You can use STDERR for debug logs in your function
-    console.error(
-      'Cart total is not high enough, no need to hide the payment method.'
-    )
-    return NO_CHANGES
-  }
-
   // Find the payment methods to hide
   const hideAfterpayPaymentMethod = input.paymentMethods.find((method) =>
     method.name.includes('Afterpay')
   )
+  console.log('hideAfterpayPaymentMethod ', hideAfterpayPaymentMethod)
 
   const hideLaybuyPaymentMethod = input.paymentMethods.find((method) =>
     method.name.includes('Laybuy')
   )
+  console.log('hideLaybuyPaymentMethod ', hideLaybuyPaymentMethod)
 
   const hideZipPaymentMethod = input.paymentMethods.find((method) =>
     method.name.includes('Zip')
   )
+  console.log('hideZipPaymentMethod ', hideZipPaymentMethod)
 
   const hideKlarnaPaymentMethod = input.paymentMethods.find((method) =>
     method.name.includes('Klarna')
   )
+  console.log('hideKlarnaPaymentMethod ', hideKlarnaPaymentMethod)
 
-  if (hideAfterpayPaymentMethod) {
+  if (hideAfterpayPaymentMethod && !afterpay) {
     PAYMENT_METHODS_TO_HIDE.push({
       hide: {
         paymentMethodId: hideAfterpayPaymentMethod.id,
@@ -76,7 +73,7 @@ export default /**
     })
   }
 
-  if (hideLaybuyPaymentMethod) {
+  if (hideLaybuyPaymentMethod && !laybuy) {
     PAYMENT_METHODS_TO_HIDE.push({
       hide: {
         paymentMethodId: hideLaybuyPaymentMethod.id,
@@ -84,7 +81,7 @@ export default /**
     })
   }
 
-  if (hideZipPaymentMethod) {
+  if (hideZipPaymentMethod && !zip) {
     PAYMENT_METHODS_TO_HIDE.push({
       hide: {
         paymentMethodId: hideZipPaymentMethod.id,
@@ -92,12 +89,17 @@ export default /**
     })
   }
 
-  if (hideKlarnaPaymentMethod) {
+  if (hideKlarnaPaymentMethod && !klarna) {
     PAYMENT_METHODS_TO_HIDE.push({
       hide: {
         paymentMethodId: hideKlarnaPaymentMethod.id,
       },
     })
+  }
+
+  if (afterpay && laybuy && zip && klarna) {
+    console.log('no changes ')
+    return NO_CHANGES
   }
 
   // The @shopify/shopify_function package applies JSON.stringify() to your function result
